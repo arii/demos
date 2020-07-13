@@ -6,9 +6,66 @@
       this.device = null;
       this.server = null;
       this._characteristics = new Map();
+	  this.status_msg = "Not initialized";
+	  window.setInterval(this.reportStatus.bind(this), 1000);
+
     }
+	
+	reportStatus(){
+		// report status messages
+		if (this.server == null){
+			this.status_msg = "not initialized";
+		}else if (this.server.connected){
+			this.status_msg = "connected";
+		}else{
+			this.status_msg = "disconnected";
+		}
+			
+		var status = this.status_msg;
+		console.log("status: " + status);
+		const event = new CustomEvent('status', { detail: status });
+		document.dispatchEvent(event);
+
+	}
+	
+	init(){
+	return navigator.bluetooth.requestDevice({filters:[{services:[ 'heart_rate' ]}]})
+      .then(device => {
+        this.device = device;
+		console.log("initialized device:" + this.device.name);
+		this.device.addEventListener('gattserverdisconnected', this.onDisconnected.bind(this));
+		return this.connect_();
+	})}
+	
+	onDisconnected(){
+		console.log("disconnected");
+		this.status_msg = "disconnected";
+	}
+		
+	connect_ = function(){
+		console.log("connecting device:" + this.device.name);
+		return this.device.gatt.connect()
+		.then(server => {
+        this.server = server;
+        return Promise.all([
+          server.getPrimaryService('heart_rate').then(service => {
+            return Promise.all([
+              this._cacheCharacteristic(service, 'body_sensor_location'),
+              this._cacheCharacteristic(service, 'heart_rate_measurement'),
+				])
+			})
+        ]);
+		});
+		
+		console.log("connected");
+		
+	};
+	
     connect() {
-      return navigator.bluetooth.requestDevice({filters:[{services:[ 'heart_rate' ]}]})
+		return this.init()
+		
+		
+      /*return navigator.bluetooth.requestDevice({filters:[{services:[ 'heart_rate' ]}]})
       .then(device => {
         this.device = device;
         return device.gatt.connect();
@@ -23,7 +80,7 @@
             ])
           })
         ]);
-      })
+      })*/
     }
 
     /* Heart Rate Service */

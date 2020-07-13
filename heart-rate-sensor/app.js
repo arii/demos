@@ -1,16 +1,59 @@
 var canvas = document.querySelector('canvas');
 var statusText = document.querySelector('#statusText');
+var statusBar = document.querySelector('#statusBar');
+var last_connect_time = null;
 
 statusText.addEventListener('click', function() {
   statusText.textContent = 'Breathe...';
   heartRates = [];
-  heartRateSensor.connect()
+  initialClick();
+  
+  /*heartRateSensor.connect()
+  .then(() => heartRateSensor.startNotificationsHeartRateMeasurement().then(handleHeartRateMeasurement))
+  .catch(error => {
+    statusText.textContent = error;
+  });*/
+});
+
+function initialClick(){
+  heartRateSensor.init()
   .then(() => heartRateSensor.startNotificationsHeartRateMeasurement().then(handleHeartRateMeasurement))
   .catch(error => {
     statusText.textContent = error;
   });
-});
+}
 
+function connectHR(){
+	if (last_connect_time == null){
+		last_connect_time = Date.now();
+	}else{
+		if( (Date.now() - last_connect_time) < 1000){
+			console.log("too soon to try to reconnect... waiting");
+			return;
+		}
+		else{
+			console.log("attempting reconnect");
+		}
+	}
+	
+	heartRateSensor.connect_()
+	.then(() => heartRateSensor.startNotificationsHeartRateMeasurement().then(handleHeartRateMeasurement))
+  .catch(error => {
+    statusText.textContent = error;
+  });
+	
+}
+
+document.addEventListener("status", function(e){
+	console.log("I heard " + e.detail);
+	statusBar.textContent = e.detail;
+	if(e.detail == "disconnected"){
+		// trigger reconnect
+		connectHR();
+	}
+}, false);
+
+	
 function handleHeartRateMeasurement(heartRateMeasurement) {
   heartRateMeasurement.addEventListener('characteristicvaluechanged', event => {
     var heartRateMeasurement = heartRateSensor.parseHeartRate(event.target.value);
