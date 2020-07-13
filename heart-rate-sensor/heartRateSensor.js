@@ -20,12 +20,21 @@
 		}else{
 			this.status_msg = "disconnected";
 		}
-			
+	
+		
+		if(this.status_msg == "connected"){
+			if(this._characteristics.get("heart_rate_measurement") != null){
+				var result = this.parseHeartRate(this._characteristics.get("heart_rate_measurement").value);
+				if (!result.contactDetected){
+					this.status_msg += "-- bad contact";
+				}
+				}
+			}
+		
 		var status = this.status_msg;
 		console.log("status: " + status);
 		const event = new CustomEvent('status', { detail: status });
 		document.dispatchEvent(event);
-
 	}
 	
 	init(){

@@ -2,6 +2,8 @@ var canvas = document.querySelector('canvas');
 var statusText = document.querySelector('#statusText');
 var statusBar = document.querySelector('#statusBar');
 var last_connect_time = null;
+var last_update = null;
+
 
 statusText.addEventListener('click', function() {
   statusText.textContent = 'Breathe...';
@@ -27,12 +29,17 @@ function connectHR(){
 	if (last_connect_time == null){
 		last_connect_time = Date.now();
 	}else{
-		if( (Date.now() - last_connect_time) < 1000){
+		if( (Date.now() - last_connect_time) < 1500){
 			console.log("too soon to try to reconnect... waiting");
+			    statusText.innerHTML = "reconnecting";
+
 			return;
 		}
 		else{
 			console.log("attempting reconnect");
+			last_connect_time = Date.now();
+			statusText.innerHTML += ".";
+
 		}
 	}
 	
@@ -50,11 +57,25 @@ document.addEventListener("status", function(e){
 	if(e.detail == "disconnected"){
 		// trigger reconnect
 		connectHR();
+		statusBar.style.backgroundColor = "red";
+
+	}else if(e.detail == "connected-- bad contact"){
+		// orange
+		console.log("orange");
+		statusBar.style.backgroundColor = "orange";
+
+	}else if(e.detail == "connected"){
+		console.log("green");
+		statusBar.style.backgroundColor = "green";
+
 	}
+	
+	
 }, false);
 
 	
 function handleHeartRateMeasurement(heartRateMeasurement) {
+	
   heartRateMeasurement.addEventListener('characteristicvaluechanged', event => {
     var heartRateMeasurement = heartRateSensor.parseHeartRate(event.target.value);
     statusText.innerHTML = heartRateMeasurement.heartRate + ' &#x2764;';
