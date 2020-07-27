@@ -93,6 +93,7 @@ Timer.prototype = {
             var delta = Math.floor((new Date().getTime() - this._startTime) / 1000) * 1000;
             this._currentTotal = delta;
             var starting = false;
+            var finished = false;
 
             // Tick only once per second
             if (this._currentTotal - this._lastTick  >= 1000) {
@@ -124,6 +125,7 @@ Timer.prototype = {
                                 ++this._currentSet;
                                 if (this._currentSet >= this.sets.length) {
                                     this.stopTimer();
+                                    finished= true;
                                 }
                                 else {
                                     this._newSetCb(this);
@@ -146,7 +148,7 @@ Timer.prototype = {
                         elapsed = elapsed % (100 * 60 * 1000);
                     }
                 }
-                this._tickCb(this, elapsed, isCountdown, starting);
+                this._tickCb(this, elapsed, isCountdown, starting, this._setWorking, finished);
             }
             setTimeout(loop, 100);
         }.bind(this);

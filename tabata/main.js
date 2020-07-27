@@ -43,6 +43,11 @@
     var renderIntervals = function(timer) {
         document.getElementById('intervalCount').childNodes[0].nodeValue = timer.currentSet() + '/' + timer.sets.length;
     };
+    
+    var renderStatus = function(text) {
+        document.getElementById('status_text').childNodes[0].nodeValue = text;
+    };
+
 
     var renderControls = function(timer) {
         var el = document.getElementById('startStop');
@@ -59,7 +64,7 @@
 
     var selectedLap = null;
     var lastTickTime = null;
-    var isMuted = true;
+    var isMuted = false;
     var loadedAudio = false;
     var shortBeep = document.getElementById('shortBeep');
     var longBeep = document.getElementById('longBeep');
@@ -92,7 +97,7 @@
         longBeep.play();
     }
 
-    var tickCb = function(timer, elapsed, isStartCountdown, starting) {
+    var tickCb = function(timer, elapsed, isStartCountdown, starting, setWorking, finished) {
         lastTickTime = elapsed;
 
         if (!selectedLap) {
@@ -103,6 +108,19 @@
 
             // Starting countdown or countdown timer and reached the end of the timer
             // then beep
+            if(isStartCountdown){
+                renderStatus("starting");
+            }else if (timer.isCountdownTimer()){
+                if(finished){
+                    renderStatus("done");
+                }else if (setWorking){
+                    renderStatus("work");
+                }else{
+                    renderStatus("rest");
+                }
+
+            }
+        
             if (isStartCountdown || timer.isCountdownTimer()) {
                 if (elapsed > 0 && elapsed <= 3000) {
                     playShort();
@@ -111,47 +129,44 @@
 
             if (starting || (timer.isCountdownTimer() && elapsed <= 0)) {
                 playLong();
-            }
 
+            }
             renderTime(elapsed, format);
         }
     };
 
     var newLapCb = function(timer) {
-        var i = timer.laps().length - 1;
-        lapElByIndex(i).classList.remove('hidden');
+        // pass
+        return; 
     };
 
+    
     var clearCb = function(timer) {
-        var i;
-        for (i=0; i<10; ++i) {
-            lapElByIndex(i).classList.add('hidden');
-        }
-        for (i=0; i<10; ++i) {
-            lapElByIndex(i).classList.remove('lapSelected');
-        }
-
         selectedLap = null;
         renderTime(0);
         renderControls(timer);
         renderIntervals(timer);
+        renderStatus("Finished session");
     };
 
     var newSetCb = function(timer) {
         renderIntervals(timer);
+        renderStatus("rest");
     };
 
     var timer = new Timer(tickCb, newLapCb, clearCb, newSetCb);
-
+    /*
     byId('lapReset').addEventListener('click', function() {
         timer.lapResetTimer();
     });
+    */
 
     byId('startStop').addEventListener('click', function() {
+        updateValuesFromInputs();
         timer.toggleTimer();
         renderControls(timer);
     });
-
+    /* removing laps
     byId('laps').addEventListener('click', function(evt) {
         for (var i=0; i<10; ++i) {
             lapElByIndex(i).classList.remove('lapSelected');
@@ -170,6 +185,7 @@
             renderTime(lap.time);
         }
     });
+    */
 
     byId('muteToggleButton').addEventListener('click', function(evt) {
         isMuted = !isMuted;
@@ -189,7 +205,13 @@
         byId('settingsUI').classList.remove('hidden');
     });
 
+
     byId('done').addEventListener('click', function(evt) {
+        updateValuesFromInputs();
+    });
+
+
+    function updateValuesFromInputs(){
         function getVal(value) {
             var val = parseInt(value, 10);
             if (isNaN(val)) {
@@ -236,7 +258,8 @@
         renderIntervals(timer);
         renderTime(minSecToMS(countdownMin, countdownSec));
 
-        byId('settingsUI').classList.add('hidden');
-        byId('timerUI').classList.remove('hidden');
-    });
+       // byId('settingsUI').classList.add('hidden');
+       // byId('timerUI').classList.remove('hidden');
+    }
+    //);
 })();
