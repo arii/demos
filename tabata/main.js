@@ -166,6 +166,27 @@
         timer.toggleTimer();
         renderControls(timer);
     });
+
+    
+    byId('emom').addEventListener('click', function() {
+        updateHotkeys("60", "60");
+    });
+
+    byId('twentyten').addEventListener('click', function() {
+        updateHotkeys("20", "10");
+    });
+
+    byId('thirtyfifteen').addEventListener('click', function() {
+        updateHotkeys("30", "15");
+    });
+
+
+    var updateHotkeys= function(work, rest){
+
+        byId('workSec').value = work
+        byId('restSec').value = rest
+
+    }
     /* removing laps
     byId('laps').addEventListener('click', function(evt) {
         for (var i=0; i<10; ++i) {

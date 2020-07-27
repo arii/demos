@@ -16,19 +16,37 @@
         <circle id="startStopBorder" r="12" cx="80" cy="5" stroke-width="0.2" fill="none" />
         <circle id="startStop" r="11.5" cx="80" cy="5"/>
         <g id="intervalUI" class="hidden">
-          <text id="intervalHeader" y="3" x="20" text-anchor="middle">INTERVAL</text>
-          <text id="intervalCount" y="13" x="20" text-anchor="middle">1/16</text>
+          <text id="intervalHeader" y="3" x="40" text-anchor="middle">INTERVAL</text>
+          <text id="intervalCount" y="13" x="40" text-anchor="middle">1/16</text>
         </g>
         
         <g id="statusUI" class="">
-          <text id="status_text" y="-10" x="20" text-anchor="middle">Tabata</text>
+          <text id="status_text" y="-10" x="40" text-anchor="middle">Tabata</text>
         </g>
+
+
+    <g id="twentyten">
+        <rect x="0" y="-7" width="10" height="4.5" fill="blue"></rect>
+        <text x="0.5" y="-3.5" font-family="Verdana" font-size="4" fill="white">20/10</text>
+    </g>
+
+
+    <g id="thirtyfifteen">
+        <rect x="0" y="0" width="10" height="4.5" fill="blue"></rect>
+        <text x="0.5" y="3.5" font-family="Verdana" font-size="4" fill="white">30/15</text>
+    </g>
+    
+    <g id="emom">
+        <rect x="0" y="7" width="10" height="4.5" fill="blue"></rect>
+        <text x="0.5" y="10.5" font-family="Verdana" font-size="4" fill="white">60/60</text>
+    </g>
+
 
       </svg>
 
       <div id="timerButtons">
         <a id="muteToggleButton">
-          <img src="speaker.png" width="20" height="16"/>
+          <img src="speaker.png" width="60" height="48"/>
           <!--<img src="speaker-muted.png" width="20" height="16"/> -->
         </a>
         <a id="settingsButton" class="hidden">
@@ -56,9 +74,9 @@
       </div>
       <div class="numSets">
         <label># INTERVALS</label>
-        <input id="setsCount" type="number" placeholder="0" min="0" max="99" value="1"/>
+        <input id="setsCount" type="number" placeholder="0" min="0" max="99" value="8"/>
       </div>
-      <div class="buttons">
+      <div class="buttons hidden">
         <button id="done">Done</button>
       </div>
     </div>
