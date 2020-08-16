@@ -24,7 +24,10 @@
 
     <script>
       $(function () {
-        var socket = io();
+          const socket = io( {
+              transports:['websocket']
+          });
+
         $('form').submit(function(){
           socket.emit('chat message', $('#m').val());
           $('#m').val('');
